@@ -8,6 +8,24 @@ void Game::initWindow()
 	this->window->setVerticalSyncEnabled(false);
 }
 
+void Game::initWelcome()
+{
+	if(!this->welcomeTex.loadFromFile("Textures/welcome.png"))
+	{
+		std::cout <<"ERROR Welcome pic" <<"\n";
+	}
+	this->welcome.setTexture(this->welcomeTex);
+	this->welcome.scale(0.75f,0.75f);
+}
+
+void Game::renderWelcome()
+{
+	this->window->clear();
+	this->window->draw(this->welcome);
+	this->window->draw(this->welcomeText);
+	this->window->display();
+}
+
 void Game::initGUI()
 {
 	//Load font
@@ -19,7 +37,15 @@ void Game::initGUI()
 	this->pointText.setFont(this->font);
 	this->pointText.setCharacterSize(20);
 	this->pointText.setColor(sf::Color::White);
-	this->pointText.setString("test");
+
+	this->welcomeText.setFont(this->font);
+	this->welcomeText.setCharacterSize(60);
+	this->welcomeText.setColor(sf::Color::Red);
+	this->welcomeText.setString("Please press P to start");
+	this->welcomeText.setPosition(
+		this->window->getSize().x / 2.f - this->welcomeText.getGlobalBounds().width / 2.f, 
+		this->window->getSize().y / 2.f - this->welcomeText.getGlobalBounds().height / 2.f);
+
 
 	this->gameOverText.setFont(this->font);
 	this->gameOverText.setCharacterSize(60);
@@ -75,11 +101,11 @@ void Game::initTextures()
 Game::Game(void)
 {
 	this->initWindow();
+	this->initWelcome();
 	this->initTextures();
 	this->initGUI();
 	this->initWorld();
 	this->initSystems();
-
 	this->initPlayer();
 	this->initEnemies();
 }
@@ -105,15 +131,20 @@ Game::~Game(void)
 
 void Game::run()
 {
+	do
+	{
+		this->renderWelcome();
+	}while(!sf::Keyboard::isKeyPressed(sf::Keyboard::P));
+
 	while (this->window->isOpen())
 	{
 		this->updatePollEvents();
-
 		if(this->player->getHp() > 0)
 			this->update();
 
 		this->render();
 	}
+
 }
 
 void Game::updatePollEvents()
@@ -137,7 +168,7 @@ void Game::updateInput()
 		this->player->move(1.f,0.f);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 		this->player->move(0.f,-1.f);
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 		this->player->move(0.f,1.f);
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && this->player->canAttack())
 	{
@@ -330,7 +361,17 @@ void Game::render()
 
 	//Game over screen
 	if (this->player->getHp() <= 0)
+	{
 		this->window->draw(this->gameOverText);
+		if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		{
+			delete this->player;
+			this->initPlayer();
+			this->initEnemies();
+			this->initSystems();
+		}
+
+	}
 
 	this->window->display();
 }

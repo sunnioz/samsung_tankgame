@@ -12,8 +12,15 @@
 class Game
 {
 private:
+
+
 	//Window
 	sf::RenderWindow* window;
+
+	// Welcome
+
+	sf::Texture welcomeTex;
+	sf::Sprite welcome;
 
 	//Resources
 	std::map<std::string, sf::Texture*> textures;
@@ -21,8 +28,8 @@ private:
 
 	//GUI
 	sf::Font font;
+	sf::Text welcomeText;
 	sf::Text pointText;
-
 	sf::Text gameOverText;
 
 	//World
@@ -47,7 +54,7 @@ private:
 
 
 	void initWindow();
-
+	void initWelcome();
 	void initTextures();
 	void initGUI();
 	void initWorld();
@@ -75,6 +82,7 @@ public:
 	void update();
 
 	void renderGUI();
+	void renderWelcome();
 	void renderWorld();
 	void render();
 };
